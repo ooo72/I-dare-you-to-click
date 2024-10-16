@@ -49,12 +49,15 @@
     </div>
 
     <script>
-        function triggerJumpscare() {
+        function triggerJumpscare() 
             document.getElementById('jumpscare').style.display = 'block';
-            document.getElementById('scream').play();
-
+            document.getElementById('scream').play(
+                
+            document.getElementById('dare-button').style.display = 'none';
+        
             setTimeout(() => {
                 document.getElementById('jumpscare').style.display = 'none';
+                document.getElementById('main-text').innerText = 'Lesson Learned: Dont trust website links!';
             }, 3000);
         }
     </script>
