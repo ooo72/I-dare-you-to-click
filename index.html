@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Shiny Button</title>
 
+    <!-- Favicon (Icon shown in the browser tab) -->
     <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
     
+    <!-- Open Graph meta tags for sharing -->
     <meta property="og:title" content="The Shiny Button">
-    <meta property="og:description" content="Do you wanna know how satisfying is pressing it? lets find out">
+    <meta property="og:description" content="Do you wanna know how satisfying it is to press this button? Let's find out.">
     <meta property="og:image" content="https://i.pinimg.com/736x/7a/9d/2f/7a9d2fe6e2830f624451e175950d2d1d.jpg">
     <meta property="og:url" content="https://ooo72.github.io/I-dare-you-to-click-this-button">
     <meta property="og:type" content="website">
@@ -40,8 +42,8 @@
 </head>
 <body>
 
-    <h1>The button looks such shiny today! would you mind pressing it?</h1>
-    <button onclick="triggerJumpscare()">Button</button>
+    <h1 id="main-text">The button looks so shiny today! Would you mind pressing it?</h1>
+    <button id="dare-button" onclick="triggerJumpscare()">Button</button>
 
     <div id="jumpscare">
         <img src="https://s4.ezgif.com/tmp/ezgif-4-9bd18fc312.gif" alt="Jumpscare GIF">
@@ -49,15 +51,16 @@
     </div>
 
     <script>
-        function triggerJumpscare() 
-            document.getElementById('jumpscare').style.display = 'block';
-            document.getElementById('scream').play(
-                
-            document.getElementById('dare-button').style.display = 'none';
+        function triggerJumpscare()  {
         
+            document.getElementById('jumpscare').style.display = 'block';
+            document.getElementById('scream').play();
+
+            document.getElementById('dare-button').style.display = 'none';
+            
             setTimeout(() => {
                 document.getElementById('jumpscare').style.display = 'none';
-                document.getElementById('main-text').innerText = 'Lesson Learned: Dont trust website links!';
+                document.getElementById('main-text').innerText = 'Lesson Learned: Don\'t trust shiny buttons!';
             }, 3000);
         }
     </script>
