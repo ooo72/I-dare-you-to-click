@@ -1,2 +1,3 @@
-shh, this is a jumpscare, whenever you share this to somebody, dont tell them its a jumpscare!
-url : https://ooo72.github.io/I-dare-you-to-click-this-button/
+🤫 dont tell them when you share it to them
+
+url : https://ooo72.github.io/ShinyButton/
