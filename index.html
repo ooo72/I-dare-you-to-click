@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bouncing Balls</title>
-
-    <meta property="og:title" content="BounceBalls">
-    <meta property="og:description" content="'bro stop bouncing around!' dude i cant :|">
-    <meta property="og:image" content="https://cdn.discordapp.com/attachments/1266161400531914883/1296500145931948134/IMG_0882.png?ex=6712835a&is=671131da&hm=6494a00602d79e261bcd6d197ae637252c0177e4679146e2273101051c2bfd8b&">
+  <title>BounceBalls</title>
+  
+      <meta property="og:title" content="BounceBalls">
+    <meta property="og:description" content="'bro stop bouncing!' DUDE I CAANNNTTT!!!!">
+    <meta property="og:image" content="https://cdn.discordapp.com/attachments/1266161400531914883/1296500145931948134/IMG_0882.png?ex=6712835a&is=671131da&hm=6494a00602d79e261bcd6d197ae637252c0177e4679146e2273101051c2bfd8b">
     <meta property="og:url" content="https://ooo72.github.io/BounceBalls">
-    <meta property="og:type" content="website">
 
   <style>
     body {
@@ -35,7 +34,7 @@
     }
 
     canvas {
-      display: none; 
+      display: none;
       position: absolute;
       top: 0;
       left: 0;
@@ -51,9 +50,13 @@
     const ctx = canvas.getContext("2d");
     const startButton = document.getElementById("startButton");
 
-    
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    const gravity = 0.5; 
+    const friction = 0.98;  
+    const bounceFactor = 0.7;  
+    const throwThreshold = 4; 
 
     class Ball {
       constructor(x, y, radius, color) {
@@ -61,9 +64,12 @@
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.vx = (Math.random() - 0.5) * 10;
-        this.vy = (Math.random() - 0.5) * 10;
+        this.vx = 0; 
+        this.vy = 0; 
         this.isDragging = false;
+        this.lastX = x;
+        this.lastY = y;
+        this.lastTime = Date.now();
       }
 
       draw() {
@@ -76,22 +82,43 @@
 
       update() {
         if (!this.isDragging) {
+        
+          this.vy += gravity;
+          this.vy *= friction; 
+          this.vx *= friction; 
+
           this.x += this.vx;
           this.y += this.vy;
 
-        
+          
           if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
-            this.vx = -this.vx;
+            this.vx = -this.vx * bounceFactor;  
+            this.x = Math.max(this.radius, Math.min(this.x, canvas.width - this.radius));
           }
-          if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
-            this.vy = -this.vy;
+
+          
+          if (this.y + this.radius > canvas.height) {
+            this.vy = -this.vy * bounceFactor; 
+            this.y = canvas.height - this.radius;  
           }
         }
         this.draw();
       }
 
+      
       isMouseOver(mx, my) {
         return Math.sqrt((mx - this.x) ** 2 + (my - this.y) ** 2) < this.radius;
+      }
+
+     
+      calculateVelocity(currentX, currentY) {
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.vx = (currentX - this.lastX) / deltaTime;
+        this.vy = (currentY - this.lastY) / deltaTime;
+        this.lastX = currentX;
+        this.lastY = currentY;
+        this.lastTime = currentTime;
       }
     }
 
@@ -105,8 +132,11 @@
         if (ball.isMouseOver(x, y)) {
           draggingBall = ball;
           draggingBall.isDragging = true;
+          draggingBall.lastX = x;
+          draggingBall.lastY = y;
           offsetX = x - ball.x;
           offsetY = y - ball.y;
+          draggingBall.lastTime = Date.now();
           break;
         }
       }
@@ -116,12 +146,19 @@
       if (draggingBall) {
         draggingBall.x = x - offsetX;
         draggingBall.y = y - offsetY;
+        draggingBall.calculateVelocity(x, y); 
       }
     }
 
     function handleDragEnd() {
       if (draggingBall) {
-        draggingBall.isDragging = false;
+        
+        if (Math.abs(draggingBall.vx) > throwThreshold || Math.abs(draggingBall.vy) > throwThreshold) {
+          draggingBall.isDragging = false;
+        } else {
+          draggingBall.vx = 0;
+          draggingBall.vy = 0;
+        }
         draggingBall = null;
       }
     }
@@ -131,7 +168,7 @@
     canvas.addEventListener("mousemove", (e) => handleDragMove(e.clientX, e.clientY));
     canvas.addEventListener("mouseup", handleDragEnd);
 
-  
+    
     canvas.addEventListener("touchstart", (e) => {
       const touch = e.touches[0];
       handleDragStart(touch.clientX, touch.clientY);
@@ -162,7 +199,7 @@
       
       canvas.style.display = 'block';
 
-     
+      
       for (let i = 0; i < 5; i++) {
         const radius = 30;
         const x = Math.random() * (canvas.width - radius * 2) + radius;
