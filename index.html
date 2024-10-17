@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BounceBalls</title>
   
-      <meta property="og:title" content="BounceBalls">
-    <meta property="og:description" content="'bro stop bouncing!' DUDE I CAANNNTTT!!!!">
-    <meta property="og:image" content="https://cdn.discordapp.com/attachments/1266161400531914883/1296500145931948134/IMG_0882.png?ex=6712835a&is=671131da&hm=6494a00602d79e261bcd6d197ae637252c0177e4679146e2273101051c2bfd8b">
-    <meta property="og:url" content="https://ooo72.github.io/BounceBalls">
+  <meta property="og:title" content="BounceBalls">
+  <meta property="og:description" content="'bro stop bouncing!' DUDE I CAANNNTTT!!!!">
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1266161400531914883/1296500145931948134/IMG_0882.png">
+  <meta property="og:url" content="https://ooo72.github.io/BounceBalls">
 
   <style>
     body {
@@ -33,7 +33,7 @@
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-canvas {
+    canvas {
       display: none;
       position: absolute;
       top: 0;
@@ -53,9 +53,9 @@ canvas {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const gravity = 0.5; 
-    const friction = 0.98;  
-    const bounceFactor = 0.8;  
+    const gravity = 0.5;
+    const friction = 0.98;
+    const bounceFactor = 0.8;
 
     class Ball {
       constructor(x, y, radius, color) {
@@ -63,8 +63,8 @@ canvas {
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.vx = 0; 
-        this.vy = 0; 
+        this.vx = 0;
+        this.vy = 0;
         this.isDragging = false;
         this.lastX = x;
         this.lastY = y;
@@ -81,41 +81,36 @@ canvas {
 
       update() {
         if (!this.isDragging) {
-          
           this.vy += gravity;
-          this.vy *= friction;  
-          this.vx *= friction;  
+          this.vy *= friction;
+          this.vx *= friction;
 
           this.x += this.vx;
           this.y += this.vy;
 
-          
           if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
             this.vx = -this.vx * bounceFactor;
-            this.x = Math.max(this.radius, Math.min(this.x, canvas.width - this.radius));  
+            this.x = Math.max(this.radius, Math.min(this.x, canvas.width - this.radius));
           }
 
-          
           if (this.y + this.radius > canvas.height) {
-            this.vy = -this.vy * bounceFactor;  
-            this.y = canvas.height - this.radius;  
+            this.vy = -this.vy * bounceFactor;
+            this.y = canvas.height - this.radius;
           } else if (this.y - this.radius < 0) {
-            this.vy = -this.vy * bounceFactor;  
+            this.vy = -this.vy * bounceFactor;
             this.y = this.radius;
           }
         }
         this.draw();
       }
 
-      
       isMouseOver(mx, my) {
         return Math.sqrt((mx - this.x) ** 2 + (my - this.y) ** 2) < this.radius;
       }
 
-      
       calculateVelocity(currentX, currentY) {
         const currentTime = Date.now();
-        const deltaTime = (currentTime - this.lastTime) / 1000; 
+        const deltaTime = (currentTime - this.lastTime) / 1000;
         this.vx = (currentX - this.lastX) / deltaTime;
         this.vy = (currentY - this.lastY) / deltaTime;
         this.lastX = currentX;
@@ -128,7 +123,6 @@ canvas {
     let draggingBall = null;
     let offsetX, offsetY;
 
-    
     function handleDragStart(x, y) {
       for (let ball of balls) {
         if (ball.isMouseOver(x, y)) {
@@ -148,23 +142,21 @@ canvas {
       if (draggingBall) {
         draggingBall.x = x - offsetX;
         draggingBall.y = y - offsetY;
-        draggingBall.calculateVelocity(x, y); 
+        draggingBall.calculateVelocity(x, y);
       }
     }
 
     function handleDragEnd() {
       if (draggingBall) {
-        draggingBall.isDragging = false; 
+        draggingBall.isDragging = false;
         draggingBall = null;
       }
     }
 
-    
     canvas.addEventListener("mousedown", (e) => handleDragStart(e.clientX, e.clientY));
     canvas.addEventListener("mousemove", (e) => handleDragMove(e.clientX, e.clientY));
     canvas.addEventListener("mouseup", handleDragEnd);
 
-    
     canvas.addEventListener("touchstart", (e) => {
       const touch = e.touches[0];
       handleDragStart(touch.clientX, touch.clientY);
@@ -180,7 +172,7 @@ canvas {
     function detectCollision(ball1, ball2) {
       const dx = ball2.x - ball1.x;
       const dy = ball2.y - ball1.y;
-      const distance = Math.sqrt(dx * dy + dy * dy);
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
       return distance < ball1.radius + ball2.radius;
     }
@@ -190,27 +182,20 @@ canvas {
       const dy = ball2.y - ball1.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-     
       if (distance === 0) return;
 
-      
       const unitX = dx / distance;
       const unitY = dy / distance;
 
-      
       const relativeVelocityX = ball2.vx - ball1.vx;
       const relativeVelocityY = ball2.vy - ball1.vy;
 
-      
       const velocityAlongCollision = relativeVelocityX * unitX + relativeVelocityY * unitY;
 
-      
       if (velocityAlongCollision > 0) return;
 
-      
       const impulse = (2 * velocityAlongCollision) / (ball1.radius + ball2.radius);
 
-      
       ball1.vx -= impulse * ball2.radius * unitX;
       ball1.vy -= impulse * ball2.radius * unitY;
       ball2.vx += impulse * ball1.radius * unitX;
@@ -224,7 +209,6 @@ canvas {
         const ball1 = balls[i];
         ball1.update();
 
-        
         for (let j = i + 1; j < balls.length; j++) {
           const ball2 = balls[j];
           if (detectCollision(ball1, ball2)) {
@@ -236,17 +220,20 @@ canvas {
       requestAnimationFrame(animate);
     }
 
-    
     startButton.addEventListener("click", () => {
-    
       startButton.style.display = 'none';
-      
-      
       canvas.style.display = 'block';
 
-    
       for (let i = 0; i < 5; i++) {
         const radius = 30;
         const x = Math.random() * (canvas.width - radius * 2) + radius;
         const y = Math.random() * (canvas.height - radius * 2) + radius;
-        const color = `hsl(${Math.random() * 360}, 50%, 50
+        const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+        balls.push(new Ball(x, y, radius, color));
+      }
+
+      animate();
+    });
+  </script>
+</body>
+</html>
