@@ -221,19 +221,19 @@
     }
 
     startButton.addEventListener("click", () => {
-      startButton.style.display = 'none';
-      canvas.style.display = 'block';
+  startButton.style.display = 'none';
+  canvas.style.display = 'block';
 
-      for (let i = 0; i < 5; i++) {
-        const radius = 30;
-        const x = Math.random() * (canvas.width - radius * 2) + radius;
-        const y = Math.random() * (canvas.height - radius * 2) + radius;
-        const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
-        balls.push(new Ball(x, y, radius, color));
-      }
+  for (let i = 0; i < 5; i++) {
+    const radius = 30;
+    const x = Math.random() * (canvas.width - radius * 2) + radius;
+    const y = Math.random() * (canvas.height - radius * 2) + radius;
+    const color = `hsl(${Math.random() * 360}, 50%, 50%)`;  // Corrected here
+    balls.push(new Ball(x, y, radius, color));
+  }
 
-      animate();
-    });
+  animate();
+});
   </script>
 </body>
 </html>
