@@ -20,7 +20,7 @@
       align-items: center;
       height: 100vh;
     }
-
+    
     #startButton {
       position: absolute;
       padding: 15px 30px;
@@ -53,10 +53,9 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const gravity = 0.5; 
+    const gravity = 0.5;  
     const friction = 0.98;  
-    const bounceFactor = 0.7;  
-    const throwThreshold = 0.5; 
+    const bounceFactor = 0.8;  
 
     class Ball {
       constructor(x, y, radius, color) {
@@ -82,38 +81,41 @@
 
       update() {
         if (!this.isDragging) {
-        
+         
           this.vy += gravity;
-          this.vy *= friction; 
-          this.vx *= friction; 
+          this.vy *= friction;  
+          this.vx *= friction;  
 
           this.x += this.vx;
           this.y += this.vy;
 
-          
+        
           if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
             this.vx = -this.vx * bounceFactor;  
-            this.x = Math.max(this.radius, Math.min(this.x, canvas.width - this.radius));
+            this.x = Math.max(this.radius, Math.min(this.x, canvas.width - this.radius));  
           }
 
           
           if (this.y + this.radius > canvas.height) {
-            this.vy = -this.vy * bounceFactor; 
+            this.vy = -this.vy * bounceFactor;  
             this.y = canvas.height - this.radius;  
+          } else if (this.y - this.radius < 0) {
+            this.vy = -this.vy * bounceFactor;  
+            this.y = this.radius;
           }
         }
         this.draw();
       }
 
-      
+    
       isMouseOver(mx, my) {
         return Math.sqrt((mx - this.x) ** 2 + (my - this.y) ** 2) < this.radius;
       }
 
-     
+    
       calculateVelocity(currentX, currentY) {
         const currentTime = Date.now();
-        const deltaTime = (currentTime - this.lastTime) / 1000;
+        const deltaTime = (currentTime - this.lastTime) / 1000; 
         this.vx = (currentX - this.lastX) / deltaTime;
         this.vy = (currentY - this.lastY) / deltaTime;
         this.lastX = currentX;
@@ -146,19 +148,13 @@
       if (draggingBall) {
         draggingBall.x = x - offsetX;
         draggingBall.y = y - offsetY;
-        draggingBall.calculateVelocity(x, y); 
+        draggingBall.calculateVelocity(x, y);  
       }
     }
 
     function handleDragEnd() {
       if (draggingBall) {
-        
-        if (Math.abs(draggingBall.vx) > throwThreshold || Math.abs(draggingBall.vy) > throwThreshold) {
-          draggingBall.isDragging = false;
-        } else {
-          draggingBall.vx = 0;
-          draggingBall.vy = 0;
-        }
+        draggingBall.isDragging = false; 
         draggingBall = null;
       }
     }
@@ -193,7 +189,7 @@
 
     
     startButton.addEventListener("click", () => {
-      
+    
       startButton.style.display = 'none';
       
       
