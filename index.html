@@ -28,7 +28,7 @@
     }
 
     canvas {
-      display: none;
+      display: none; 
       position: absolute;
       top: 0;
       left: 0;
@@ -92,34 +92,50 @@
     let draggingBall = null;
     let offsetX, offsetY;
 
-    // Mouse event listeners
-    canvas.addEventListener("mousedown", (e) => {
-      const mx = e.clientX;
-      const my = e.clientY;
+    
+    function handleDragStart(x, y) {
       for (let ball of balls) {
-        if (ball.isMouseOver(mx, my)) {
+        if (ball.isMouseOver(x, y)) {
           draggingBall = ball;
           draggingBall.isDragging = true;
-          offsetX = mx - ball.x;
-          offsetY = my - ball.y;
+          offsetX = x - ball.x;
+          offsetY = y - ball.y;
           break;
         }
       }
-    });
+    }
 
-    canvas.addEventListener("mousemove", (e) => {
+    function handleDragMove(x, y) {
       if (draggingBall) {
-        draggingBall.x = e.clientX - offsetX;
-        draggingBall.y = e.clientY - offsetY;
+        draggingBall.x = x - offsetX;
+        draggingBall.y = y - offsetY;
       }
-    });
+    }
 
-    canvas.addEventListener("mouseup", () => {
+    function handleDragEnd() {
       if (draggingBall) {
         draggingBall.isDragging = false;
         draggingBall = null;
       }
+    }
+
+    
+    canvas.addEventListener("mousedown", (e) => handleDragStart(e.clientX, e.clientY));
+    canvas.addEventListener("mousemove", (e) => handleDragMove(e.clientX, e.clientY));
+    canvas.addEventListener("mouseup", handleDragEnd);
+
+  
+    canvas.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      handleDragStart(touch.clientX, touch.clientY);
     });
+
+    canvas.addEventListener("touchmove", (e) => {
+      const touch = e.touches[0];
+      handleDragMove(touch.clientX, touch.clientY);
+    });
+
+    canvas.addEventListener("touchend", handleDragEnd);
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -131,7 +147,7 @@
       requestAnimationFrame(animate);
     }
 
-    // Create balls when Start button is clicked
+    
     startButton.addEventListener("click", () => {
       
       startButton.style.display = 'none';
@@ -139,7 +155,7 @@
       
       canvas.style.display = 'block';
 
-      
+     
       for (let i = 0; i < 5; i++) {
         const radius = 30;
         const x = Math.random() * (canvas.width - radius * 2) + radius;
