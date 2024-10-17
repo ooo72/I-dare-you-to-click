@@ -1,67 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Shiny Button</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bouncing Balls</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-    <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
+    #startButton {
+      position: absolute;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-    <meta property="og:title" content="The Shiny Button">
-    <meta property="og:description" content="Do you wanna know what happens after pressing this button? Let's find out.">
-    <meta property="og:image" content="https://i.pinimg.com/736x/7a/9d/2f/7a9d2fe6e2830f624451e175950d2d1d.jpg">
-    <meta property="og:url" content="https://ooo72.github.io/ShinyButton">
-    <meta property="og:type" content="website">
-
-    <style>
-        body {
-            text-align: center;
-            margin-top: 100px;
-            font-family: Arial, sans-serif;
-        }
-
-        #jumpscare {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            z-index: 9999;
-        }
-
-        #jumpscare img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
+    canvas {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
 </head>
 <body>
+  <button id="startButton">Start</button>
+  <canvas id="canvas"></canvas>
+  
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const startButton = document.getElementById("startButton");
 
-    <h1 id="main-text">The button looks so shiny today! Would you mind pressing it?</h1>
-    <button id="dare-button" onclick="triggerJumpscare()">Button</button>
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    <div id="jumpscare">
-        <image src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGF4cGVwYW50Znh3eXczeng5b2wyMHQ5NTd4dzdnZDc0dXU0Mmw5ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/y8YsS9WfatveXJKd8M/giphy.gif" alt="Jumpscare GIF">
-        <audio id="scream" src="https://cdn.discordapp.com/attachments/1266161400531914883/1296370432403832874/jumpscare_aaa.mp3?ex=67120a8c&is=6710b90c&hm=54b08b0e09d8fd9473ae45e61d8755c5fcdfeaa9c49c545933072f8b8395b56e&"></audio>
-    </div>
+    class Ball {
+      constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 10;
+        this.vy = (Math.random() - 0.5) * 10;
+        this.isDragging = false;
+      }
 
-    <script>
-        function triggerJumpscare()  {
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      update() {
+        if (!this.isDragging) {
+          this.x += this.vx;
+          this.y += this.vy;
+
         
-            document.getElementById('jumpscare').style.display = 'block';
-            document.getElementById('scream').play();
-
-            document.getElementById('dare-button').style.display = 'none';
-            
-            setTimeout(() => {
-                document.getElementById('jumpscare').style.display = 'none';
-                document.getElementById('main-text').innerText = 'get jumpscared ;)';
-            }, 3000);
+          if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+            this.vx = -this.vx;
+          }
+          if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+            this.vy = -this.vy;
+          }
         }
-    </script>
+        this.draw();
+      }
 
+      isMouseOver(mx, my) {
+        return Math.sqrt((mx - this.x) ** 2 + (my - this.y) ** 2) < this.radius;
+      }
+    }
+
+    const balls = [];
+    let draggingBall = null;
+    let offsetX, offsetY;
+
+    // Mouse event listeners
+    canvas.addEventListener("mousedown", (e) => {
+      const mx = e.clientX;
+      const my = e.clientY;
+      for (let ball of balls) {
+        if (ball.isMouseOver(mx, my)) {
+          draggingBall = ball;
+          draggingBall.isDragging = true;
+          offsetX = mx - ball.x;
+          offsetY = my - ball.y;
+          break;
+        }
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (draggingBall) {
+        draggingBall.x = e.clientX - offsetX;
+        draggingBall.y = e.clientY - offsetY;
+      }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (draggingBall) {
+        draggingBall.isDragging = false;
+        draggingBall = null;
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let ball of balls) {
+        ball.update();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Create balls when Start button is clicked
+    startButton.addEventListener("click", () => {
+      
+      startButton.style.display = 'none';
+      
+      
+      canvas.style.display = 'block';
+
+      
+      for (let i = 0; i < 5; i++) {
+        const radius = 30;
+        const x = Math.random() * (canvas.width - radius * 2) + radius;
+        const y = Math.random() * (canvas.height - radius * 2) + radius;
+        const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+        balls.push(new Ball(x, y, radius, color));
+      }
+
+      
+      animate();
+    });
+
+    
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
